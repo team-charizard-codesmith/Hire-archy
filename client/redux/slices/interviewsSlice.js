@@ -12,17 +12,17 @@ export const interviewsSlice = createSlice({
       let interviews = action.payload;
       console.log(`REDUCER: invoker ADD for ${interviews.length} entries`);
 
-      for (let contact of interviews) {
-        state.interviews.data[contact.id] = contact; //Expects all contact data structure to be passed from an array of entries
+      for (let interview of interviews) {
+        state.interviews.data[interview.id] = interview; //Expects all interview data structure to be passed from an array of entries
       }
     },
     modify: (state, action) => {
       console.log("REDUCER: invoker Modify");
-      state.interviews.data.action.payload.id = action.payload; //Expects all contact data structure to be passed
+      state.interviews.data.action.payload.id = action.payload; //Expects all interview data structure to be passed
     },
     deleteOne: (state, action) => {
       console.log("REDUCER: invoker DeleteOne");
-      delete state.interviews.data.action.payload.id; //Expects contact id to be passed
+      delete state.interviews.data.action.payload.id; //Expects interview id to be passed
     },
   },
   extraReducers(builder) {
@@ -44,8 +44,8 @@ export const interviewsSlice = createSlice({
           payload: action.payload,
         });
         let interviews = action.payload;
-        for (let contact of interviews) {
-          state.interviews.data[contact.id] = contact; //Expects all contact data structure to be passed from an array of entries
+        for (let interview of interviews) {
+          state.interviews.data[interview.id] = interview; //Expects all interview data structure to be passed from an array of entries
         }
 
         state.status = "succeeded";
@@ -92,7 +92,7 @@ export const selectAllInterviews = (state) => {
 export const selectInterviewsById = (state, interviewsIdsObj) => {
   const selectedInterviews = [];
   for (let id in interviewsIdsObj) {
-    if (state.interviews.contactIdsObj[id]) {
+    if (state.interviews.interviewIdsObj[id]) {
       selectedInterviews.push(state.interviews.interviewsIdsObj[id]);
     }
   }
