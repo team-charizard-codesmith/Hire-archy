@@ -9,15 +9,8 @@ import { setupListeners } from "@reduxjs/toolkit/query";
 
 export const store = configureStore({
   reducer: {
-    chores: choresReducer,
-    [choresApi.reducerPath]: choresApi.reducer, // Add the generated reducer as a specific top-level slice
-    groups: groupsReducer,
-    [groupsApi.reducerPath]: groupsApi.reducer,
-    users: usersReducer,
-    [usersApi.reducerPath]: usersApi.reducer,
+    companies: companiesReducer,
   },
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat([choresApi.middleware, groupsApi.middleware]),
 });
 
 setupListeners(store.dispatch);
