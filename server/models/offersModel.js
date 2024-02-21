@@ -1,18 +1,20 @@
-const database = require("../models/database");
-module.exports = companiesModel = {
-  async getAllCompanies(user_id) {
+const database = require("./database");
+module.exports = offersModel = {
+  async getAllOffers(user_id) {
     try {
       const query = {
-        text: `SELECT * FROM companies WHERE $1`,
-        values: [user_id],
+        text: `SELECT * FROM offers;`,
       };
 
+      id, company, job_id, salary, deadline, user_id;
       let result = await database.query(query);
       const normalizedResult = result.rows.map(
-        ({ id, name, address, user_id }) => ({
+        ({ id, company, job_id, salary, deadline, user_id }) => ({
           id,
-          name,
-          address,
+          company,
+          job_id,
+          salary,
+          deadline,
           user_id,
         })
       );
@@ -23,19 +25,21 @@ module.exports = companiesModel = {
       return { isError: true, payload: null, err: e };
     }
   },
-  async saveNewCompanies(companies) {
-    const numOfCompanies = companies.length;
-    const myCompaniesVals = [];
-    companies.forEach((company) => {
-      for (const key in company) {
-        myCompaniesVals.push(company[key]);
+  async saveNewOffers(offers) {
+    const numOfOffers = offers.length;
+    const myOffersVals = [];
+    offers.forEach((offer) => {
+      for (const key in offer) {
+        myOffersVals.push(offer[key]);
       }
     });
 
     let valuesArgString = "";
     let args = 0;
-    for (let i = 0; i < companies.length; i++) {
+    for (let i = 0; i < offers.length; i++) {
       let newStr = `(
+                $${++args},
+                $${++args},
                 $${++args},
                 $${++args},
                 $${++args}
@@ -46,10 +50,16 @@ module.exports = companiesModel = {
     valuesArgString = valuesArgString.slice(0, valuesArgString.length - 1);
 
     try {
+      // id, company, job_id, salary, deadline, user_id;
       const query = {
-        text: `INSERT INTO companies (name, address, user_id) 
+        text: `INSERT INTO offers (
+          company,
+          job_id,
+          salary,
+          deadline,
+          user_id) 
         VALUES ${valuesArgString}`,
-        values: myCompaniesVals,
+        values: myOffersVals,
       };
 
       let result = await database.query(query);
@@ -62,31 +72,33 @@ module.exports = companiesModel = {
       return { isError: true, err: e };
     }
   },
-  async updateCompanies(companies) {
-    const numOfCompanies = companies.length;
+  async updateOffers(offers) {
+    const numOfOffers = offers.length;
     try {
       let rowsAffected = 0,
         successfullyUpdate = [],
         errors = [];
-      companies.forEach(async (company) => {
+      offers.forEach(async (offer) => {
         try {
           const query = {
-            text: `UPDATE companies SET name = $1, address = $2, user_id = $3 WHERE id = $4  LIMIT 1;`,
+            text: `UPDATE offers SET company = $1, job_id = $2, salary = $3, deadline = $4, user_id = $5 WHERE id = $6 LIMIT 1;`,
             values: [
-              company.name,
-              company.address,
-              company.user_id,
-              company.id,
+              offer.company,
+              offer.job_id,
+              offer.salary,
+              offer.deadline,
+              offer.user_id,
+              offer.id,
             ],
           };
           let result = await database.query(query);
           if (result.rowCount >= 1) {
-            rowsAffected++, successfullyUpdate.push(company.id);
+            rowsAffected++, successfullyUpdate.push(offer.id);
           } else {
-            errors.push(company.id);
+            errors.push(offer.id);
           }
         } catch (e) {
-          errors.push(company.id);
+          errors.push(offer.id);
         }
       });
       return { isError: false, payload: result.rows };
@@ -95,11 +107,11 @@ module.exports = companiesModel = {
       return { isError: true, err: e };
     }
   },
-  async deleteCompany(company) {
+  async deleteCompany(offer) {
     try {
       const query = {
-        text: `DELETE FROM companies WHERE id = $1 LIMIT 1;`,
-        values: [company.id],
+        text: `DELETE FROM offers WHERE id = $1 LIMIT 1;`,
+        values: [offer.id],
       };
 
       let result = await database.query(query);

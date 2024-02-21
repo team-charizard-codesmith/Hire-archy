@@ -1,6 +1,10 @@
 const express = require("express");
 const path = require("path");
-const companiesRouter = require("./routes/companiesRouter");
+const companiesRouter = require("../routes/companiesRouter.js");
+const contactsRouter = require("../routes/contactsRouter.js");
+const interviewsRouter = require("../routes/interviewsRouter.js");
+const jobsRouter = require("../routes/jobsRouter.js");
+const offersRouter = require("../routes/offersRouter.js");
 const userRouter = require("../routers/userRouter.js");
 require("dotenv").config();
 
@@ -22,14 +26,11 @@ app.use("*", (req, res, next) => {
 });
 
 // serve everything from the build folder
-<<<<<<< HEAD
-app.use('/build', express.static(path.join(__dirname, '../client/build')));
 
-app.use(express.static(path.join(__dirname, '../../client/static')));
-
-=======
 app.use("/build", express.static(path.join(__dirname, "../client/build")));
->>>>>>> 7e8d0b9d3b4848b9777841ab26a8953d9d46f983
+
+app.use(express.static(path.join(__dirname, "../../client/static")));
+
 // serve index.html to any get request on the path '/'
 app.get("/", (req, res) =>
   res.status(200).sendFile(path.join(__dirname, "../client/index.html"))
@@ -38,8 +39,12 @@ app.get("/", (req, res) =>
 // will send any calls to our page through our proxy server
 // app.use('/api', apiRouter);
 app.use("/api/companies", companiesRouter);
+app.use("/api/contacts", contactsRouter);
+app.use("/api/interviews", interviewsRouter);
+app.use("/api/jobs", jobsRouter);
+app.use("/api/offers", offersRouter);
 /* ROUTE REQUESTS THROUGH userRouter */
-app.use("/user", userRouter);
+app.use("/api/user", userRouter);
 
 // 404 error handler
 app.use("/*", (req, res) => {

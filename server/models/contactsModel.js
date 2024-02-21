@@ -1,19 +1,20 @@
-const database = require("../models/database");
-module.exports = companiesModel = {
-  async getAllCompanies(user_id) {
+const database = require("./database");
+module.exports = contactsModel = {
+  async getAllContacts(user_id) {
     try {
       const query = {
-        text: `SELECT * FROM companies WHERE $1`,
-        values: [user_id],
+        text: `SELECT * FROM contacts`,
       };
 
       let result = await database.query(query);
       const normalizedResult = result.rows.map(
-        ({ id, name, address, user_id }) => ({
+        ({ id, first_name, last_name, email, title, phone }) => ({
           id,
-          name,
-          address,
-          user_id,
+          first_name,
+          last_name,
+          email,
+          title,
+          phone,
         })
       );
 
@@ -23,19 +24,21 @@ module.exports = companiesModel = {
       return { isError: true, payload: null, err: e };
     }
   },
-  async saveNewCompanies(companies) {
-    const numOfCompanies = companies.length;
-    const myCompaniesVals = [];
-    companies.forEach((company) => {
-      for (const key in company) {
-        myCompaniesVals.push(company[key]);
+  async saveNewContacts(contacts) {
+    const numOfContacts = contacts.length;
+    const myContactsVals = [];
+    contacts.forEach((contact) => {
+      for (const key in contact) {
+        myContactsVals.push(contact[key]);
       }
     });
 
     let valuesArgString = "";
     let args = 0;
-    for (let i = 0; i < companies.length; i++) {
+    for (let i = 0; i < contacts.length; i++) {
       let newStr = `(
+                $${++args},
+                $${++args},
                 $${++args},
                 $${++args},
                 $${++args}
@@ -47,9 +50,9 @@ module.exports = companiesModel = {
 
     try {
       const query = {
-        text: `INSERT INTO companies (name, address, user_id) 
+        text: `INSERT INTO contacts (first_name, last_name, email, title, phone) 
         VALUES ${valuesArgString}`,
-        values: myCompaniesVals,
+        values: myContactsVals,
       };
 
       let result = await database.query(query);
@@ -62,31 +65,34 @@ module.exports = companiesModel = {
       return { isError: true, err: e };
     }
   },
-  async updateCompanies(companies) {
-    const numOfCompanies = companies.length;
+  async updateContacts(contacts) {
+    const numOfContacts = contacts.length;
     try {
       let rowsAffected = 0,
         successfullyUpdate = [],
         errors = [];
-      companies.forEach(async (company) => {
+      contacts.forEach(async (contact) => {
         try {
           const query = {
-            text: `UPDATE companies SET name = $1, address = $2, user_id = $3 WHERE id = $4  LIMIT 1;`,
+            //id, first_name, last_name, email, title, phone
+            text: `UPDATE contacts SET first_name = $2, last_name = $3, email = $4, title = $5, phone = $6 WHERE id = $7 LIMIT 1;`,
             values: [
-              company.name,
-              company.address,
-              company.user_id,
-              company.id,
+              contact.first_name,
+              contact.last_name,
+              contact.email,
+              contact.title,
+              contact.phone,
+              contact.id,
             ],
           };
           let result = await database.query(query);
           if (result.rowCount >= 1) {
-            rowsAffected++, successfullyUpdate.push(company.id);
+            rowsAffected++, successfullyUpdate.push(contact.id);
           } else {
-            errors.push(company.id);
+            errors.push(contact.id);
           }
         } catch (e) {
-          errors.push(company.id);
+          errors.push(contact.id);
         }
       });
       return { isError: false, payload: result.rows };
@@ -95,11 +101,11 @@ module.exports = companiesModel = {
       return { isError: true, err: e };
     }
   },
-  async deleteCompany(company) {
+  async deleteContact(contact) {
     try {
       const query = {
-        text: `DELETE FROM companies WHERE id = $1 LIMIT 1;`,
-        values: [company.id],
+        text: `DELETE FROM contacts WHERE id = $1 LIMIT 1`,
+        values: [contact.id],
       };
 
       let result = await database.query(query);

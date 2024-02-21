@@ -1,18 +1,20 @@
-const database = require("../models/database");
-module.exports = companiesModel = {
-  async getAllCompanies(user_id) {
+const database = require("./database");
+module.exports = jobsModel = {
+  async getAllJobs(user_id) {
     try {
       const query = {
-        text: `SELECT * FROM companies WHERE $1`,
-        values: [user_id],
+        text: `SELECT * FROM jobs;`,
       };
 
       let result = await database.query(query);
       const normalizedResult = result.rows.map(
-        ({ id, name, address, user_id }) => ({
+        ({ id, title, salary, open_date, address, company_id, user_id }) => ({
           id,
-          name,
+          title,
+          salary,
+          open_date,
           address,
+          company_id,
           user_id,
         })
       );
@@ -23,19 +25,22 @@ module.exports = companiesModel = {
       return { isError: true, payload: null, err: e };
     }
   },
-  async saveNewCompanies(companies) {
-    const numOfCompanies = companies.length;
-    const myCompaniesVals = [];
-    companies.forEach((company) => {
-      for (const key in company) {
-        myCompaniesVals.push(company[key]);
+  async saveNewJobs(jobs) {
+    const numOfJobs = jobs.length;
+    const myJobsVals = [];
+    jobs.forEach((job) => {
+      for (const key in job) {
+        myJobsVals.push(job[key]);
       }
     });
 
     let valuesArgString = "";
     let args = 0;
-    for (let i = 0; i < companies.length; i++) {
+    for (let i = 0; i < jobs.length; i++) {
       let newStr = `(
+                $${++args},
+                $${++args},
+                $${++args},
                 $${++args},
                 $${++args},
                 $${++args}
@@ -47,9 +52,9 @@ module.exports = companiesModel = {
 
     try {
       const query = {
-        text: `INSERT INTO companies (name, address, user_id) 
-        VALUES ${valuesArgString}`,
-        values: myCompaniesVals,
+        text: `INSERT INTO jobs (title, salary, open_date, address, company_id, user_id) 
+        VALUES ${valuesArgString};`,
+        values: myJobsVals,
       };
 
       let result = await database.query(query);
@@ -62,31 +67,35 @@ module.exports = companiesModel = {
       return { isError: true, err: e };
     }
   },
-  async updateCompanies(companies) {
-    const numOfCompanies = companies.length;
+  async updateJobs(jobs) {
+    const numOfJobs = jobs.length;
     try {
       let rowsAffected = 0,
         successfullyUpdate = [],
         errors = [];
-      companies.forEach(async (company) => {
+      jobs.forEach(async (job) => {
         try {
+          //title, salary, open_date, address, company_id, user_id
           const query = {
-            text: `UPDATE companies SET name = $1, address = $2, user_id = $3 WHERE id = $4  LIMIT 1;`,
+            text: `UPDATE jobs SET title = $1, salary = $2, open_date = $3, address = $4, company_id = $5, user_id = %6 WHERE id = $7  LIMIT 1;`,
             values: [
-              company.name,
-              company.address,
-              company.user_id,
-              company.id,
+              job.title,
+              job.salary,
+              job.open_date,
+              job.address,
+              job.company_id,
+              job.user_id,
+              job.id,
             ],
           };
           let result = await database.query(query);
           if (result.rowCount >= 1) {
-            rowsAffected++, successfullyUpdate.push(company.id);
+            rowsAffected++, successfullyUpdate.push(job.id);
           } else {
-            errors.push(company.id);
+            errors.push(job.id);
           }
         } catch (e) {
-          errors.push(company.id);
+          errors.push(job.id);
         }
       });
       return { isError: false, payload: result.rows };
@@ -95,11 +104,11 @@ module.exports = companiesModel = {
       return { isError: true, err: e };
     }
   },
-  async deleteCompany(company) {
+  async deleteCompany(job) {
     try {
       const query = {
-        text: `DELETE FROM companies WHERE id = $1 LIMIT 1;`,
-        values: [company.id],
+        text: `DELETE FROM jobs WHERE id = $1 LIMIT 1;`,
+        values: [job.id],
       };
 
       let result = await database.query(query);
