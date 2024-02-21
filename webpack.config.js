@@ -18,7 +18,7 @@ module.exports = {
             },
             {
                 test: /\.(sa|sc|c)ss$/, // if a file name ends with sass, css or scss
-                use: ['style-loader', 'css-loader', 'sass-loader'],
+                use: ['style-loader', 'css-loader'],
             },
         ],
     },
