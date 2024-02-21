@@ -5,7 +5,7 @@ export default function TopNav() {
 
     return (
         <div className={styles.top_nav}>
-            <h2>Top Nav</h2>
+            <h2>Hire-Archy</h2>
         </div>
     );
 }

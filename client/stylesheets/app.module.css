@@ -11,13 +11,6 @@
     background: lightblue;
 }
 
-.left_nav {
-    display: flex;
-    width: 300px;
-    border: black 1px solid;
-    background: lightpink;
-}
-
 .main_container {
     display: flex;
     flex-direction: column;
