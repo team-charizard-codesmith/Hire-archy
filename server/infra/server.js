@@ -1,6 +1,7 @@
 const express = require("express");
 const path = require("path");
 const companiesRouter = require("./routes/companiesRouter");
+const userRouter = require("../routers/userRouter.js");
 require("dotenv").config();
 
 const app = express();
@@ -30,6 +31,8 @@ app.get("/", (req, res) =>
 // will send any calls to our page through our proxy server
 // app.use('/api', apiRouter);
 app.use("/api/companies", companiesRouter);
+/* ROUTE REQUESTS THROUGH userRouter */
+app.use("/user", userRouter);
 
 // 404 error handler
 app.use("/*", (req, res) => {

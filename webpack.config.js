@@ -34,11 +34,11 @@ module.exports = {
         proxy: {
             '/api': { // whenever we make an http request to the path /api, it redirects it from 8080 to 3000 to go to the backend automatically
                 target: 'http://localhost:3000',
-                pathRewrite: { '^/api': '/api' },
+                pathRewrite: { '^/user': '/user' },
             },
         },
         compress: true,
-        port: 8080,
+        port: 8090,
         // For React Router refreshing
         historyApiFallback: true,
     },
