@@ -65,11 +65,54 @@ export const companiesSlice = createSlice({
           error_stack: action.error.stack,
         });
         state.status = "failed";
+      })
+      .addCase(createCompanies.pending, (state, action) => {
+        console.log(`####### createCompanies.pending! `, {
+          state_data: state?.data,
+          status: state?.status,
+          action_type: action.type,
+          payload: action.payload,
+        });
+        state.status = "loading";
+      })
+      .addCase(createCompanies.fulfilled, (state, action) => {
+        console.log(`####### createCompanies.fulfilled! `, {
+          state_data: state?.data,
+          status: state?.status,
+          action_type: action.type,
+          payload: action.payload,
+        });
+        let companies = action.payload;
+        for (let company of companies) {
+          state.companies.data[company.id] = company; //Expects all company data structure to be passed from an array of entries
+        }
+
+        state.status = "succeeded";
+      })
+      .addCase(createCompanies.rejected, (state, action) => {
+        console.log("(`####### state.data ", state?.data);
+        console.log("(`####### state.status ", state?.status);
+        console.log(`#### action `, action);
+        state.error = action.error.message;
+        console.log(`####### createCompanies.rejected! `, {
+          state_data: state?.data,
+          status: state?.status,
+          action_type: action.type,
+          payload: action.payload,
+          error_name: action.error.name,
+          error_message: action.error.message,
+          error_stack: action.error.stack,
+        });
+        state.status = "failed";
       });
   },
 });
 
 export const { add, modify, deleteOne } = companiesSlice.actions;
+
+/*-------------------//     
+//   ASYNC THUNKS    //     
+//------------------/*/
 
 export const fetchCompanies = createAsyncThunk(
   "companies/fetchCompanies",
@@ -78,6 +121,23 @@ export const fetchCompanies = createAsyncThunk(
     const data = await response.json();
     console.log("#### fetchCompanies ", data);
     return data;
+  }
+);
+
+export const createCompanies = createAsyncThunk(
+  "companies/createCompanies",
+  async (companies) => {
+    try {
+      const response = await fetch("http://localhost:8080/api/companies/", {
+        method: "POST",
+        body: JSON.stringify({ companies: companies }),
+      });
+      const data = await response.json();
+      console.log("#### createCompanies ", data);
+      return data;
+    } catch (e) {
+      return { isError: true, payload: null };
+    }
   }
 );
 
