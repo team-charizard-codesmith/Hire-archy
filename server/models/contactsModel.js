@@ -41,7 +41,6 @@ module.exports = contactsModel = {
                 $${++args},
                 $${++args},
                 $${++args},
-                $${++args},
                 $${++args}
                 ),`;
 
@@ -51,7 +50,7 @@ module.exports = contactsModel = {
 
     try {
       const query = {
-        text: `INSERT INTO contacts (id, first_name, last_name, email, title, phone) 
+        text: `INSERT INTO contacts (first_name, last_name, email, title, phone) 
         VALUES ${valuesArgString}`,
         values: myContactsVals,
       };

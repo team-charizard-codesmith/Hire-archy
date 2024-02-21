@@ -1,6 +1,10 @@
 const express = require("express");
 const path = require("path");
-const companiesRouter = require("./routes/companiesRouter");
+const companiesRouter = require("../routes/companiesRouter.js");
+const contactsRouter = require("../routes/contactsRouter.js");
+const interviewsRouter = require("../routes/interviewsRouter.js");
+const jobsRouter = require("../routes/jobsRouter.js");
+const offersRouter = require("../routes/offersRouter.js");
 const userRouter = require("../routers/userRouter.js");
 require("dotenv").config();
 
@@ -35,8 +39,12 @@ app.get("/", (req, res) =>
 // will send any calls to our page through our proxy server
 // app.use('/api', apiRouter);
 app.use("/api/companies", companiesRouter);
+app.use("/api/contacts", contactsRouter);
+app.use("/api/interviews", interviewsRouter);
+app.use("/api/jobs", jobsRouter);
+app.use("/api/offers", offersRouter);
 /* ROUTE REQUESTS THROUGH userRouter */
-app.use("/user", userRouter);
+app.use("/api/user", userRouter);
 
 // 404 error handler
 app.use("/*", (req, res) => {

@@ -65,19 +65,30 @@ module.exports = companiesModel = {
   async updateCompanies(companies) {
     const numOfCompanies = companies.length;
     try {
-      let rowsAffected = 0, successfullyUpdate = [], errors = []
-      companies.forEach((company)=>{
-        try{
+      let rowsAffected = 0,
+        successfullyUpdate = [],
+        errors = [];
+      companies.forEach(async (company) => {
+        try {
           const query = {
-            text: `UPDATE companies SET name = $1, address = $2, user_id = $3 WHERE id = $4`,
-            values: [company.name, company.address, company.user_id, company.id],
+            text: `UPDATE companies SET name = $1, address = $2, user_id = $3 WHERE id = $4  LIMIT 1;`,
+            values: [
+              company.name,
+              company.address,
+              company.user_id,
+              company.id,
+            ],
           };
           let result = await database.query(query);
-          if (result.rowCount >= 1) {rowsAffected++, successfullyUpdate.push(company.id)}else{errors.push(company.id)};
-        }catch(e){
-          errors.push(company.id)
+          if (result.rowCount >= 1) {
+            rowsAffected++, successfullyUpdate.push(company.id);
+          } else {
+            errors.push(company.id);
+          }
+        } catch (e) {
+          errors.push(company.id);
         }
-      })
+      });
       return { isError: false, payload: result.rows };
     } catch (e) {
       console.log(`## ERR `, e);
@@ -86,18 +97,17 @@ module.exports = companiesModel = {
   },
   async deleteCompany(company) {
     try {
-      let totalNumOfCompanies = companies.length;
       const query = {
-        text: `DELETE FROM companies WHERE id = $1 LIMIT 1`,
-        values: [company.id,  totalNumOfCompanies],
+        text: `DELETE FROM companies WHERE id = $1 LIMIT 1;`,
+        values: [company.id],
       };
 
       let result = await database.query(query);
 
       return { isError: false, payload: normalizedResult, err: null };
-      } catch (e) {
-        console.log(`## ERR `, e);
-        return { isError: true, payload: null, err: e };
-      }
-  }
-  }
+    } catch (e) {
+      console.log(`## ERR `, e);
+      return { isError: true, payload: null, err: e };
+    }
+  },
+};
