@@ -23,7 +23,7 @@ module.exports = companiesModel = {
       return { isError: true, payload: null, err: e };
     }
   },
-  async saveNewCompanies() {
+  async saveNewCompanies(companies) {
     const numOfCompanies = companies.length;
     const myCompaniesVals = [];
     companies.forEach((company) => {
@@ -62,56 +62,42 @@ module.exports = companiesModel = {
       return { isError: true, err: e };
     }
   },
-  //   async updateCompanies() {
-  //     try {
-  //       const query = {
-  //         text: `SELECT * FROM companies`,
-  //         values: [],
-  //       };
+  async updateCompanies(companies) {
+    const numOfCompanies = companies.length;
+    try {
+      let rowsAffected = 0, successfullyUpdate = [], errors = []
+      companies.forEach((company)=>{
+        try{
+          const query = {
+            text: `UPDATE companies SET name = $1, address = $2, user_id = $3 WHERE id = $4`,
+            values: [company.name, company.address, company.user_id, company.id],
+          };
+          let result = await database.query(query);
+          if (result.rowCount >= 1) {rowsAffected++, successfullyUpdate.push(company.id)}else{errors.push(company.id)};
+        }catch(e){
+          errors.push(company.id)
+        }
+      })
+      return { isError: false, payload: result.rows };
+    } catch (e) {
+      console.log(`## ERR `, e);
+      return { isError: true, err: e };
+    }
+  },
+  async deleteCompany(company) {
+    try {
+      let totalNumOfCompanies = companies.length;
+      const query = {
+        text: `DELETE FROM companies WHERE id = $1 LIMIT 1`,
+        values: [company.id,  totalNumOfCompanies],
+      };
 
-  //       let result = await database.query(query);
-  //       const normalizedResult = result.rows.map(
-  //         ({ id, name, address, user_id }) => ({
-  //           id,
-  //           name,
-  //           address,
-  //           user_id,
-  //         })
-  //       );
-  //       // console.log(`rows`, result.rows);
-  //       // console.log(`row[0]`, result.rows[0]);
-  //       // console.log(`normalizedResult`, normalizedResult);
-  //       // console.log(`normalizedResult[0]`, normalizedResult[0]);
-  //       return { isError: false, payload: normalizedResult, err: null };
-  //     } catch (e) {
-  //       console.log(`## ERR `, e);
-  //       return { isError: true, payload: null, err: e };
-  //     }
-  //   },
-  //   async deleteCompanies() {
-  //     try {
-  //       const query = {
-  //         text: `SELECT * FROM companies`,
-  //         values: [],
-  //       };
+      let result = await database.query(query);
 
-  //       let result = await database.query(query);
-  //       const normalizedResult = result.rows.map(
-  //         ({ id, name, address, user_id }) => ({
-  //           id,
-  //           name,
-  //           address,
-  //           user_id,
-  //         })
-  //       );
-  //       // console.log(`rows`, result.rows);
-  //       // console.log(`row[0]`, result.rows[0]);
-  //       // console.log(`normalizedResult`, normalizedResult);
-  //       // console.log(`normalizedResult[0]`, normalizedResult[0]);
-  //       return { isError: false, payload: normalizedResult, err: null };
-  //     } catch (e) {
-  //       console.log(`## ERR `, e);
-  //       return { isError: true, payload: null, err: e };
-  //     }
-  //   },
-};
+      return { isError: false, payload: normalizedResult, err: null };
+      } catch (e) {
+        console.log(`## ERR `, e);
+        return { isError: true, payload: null, err: e };
+      }
+  }
+  }
