@@ -1,0 +1,16 @@
+.left_nav {
+    display: flex;
+    flex-direction: column;
+    ;
+    width: 300px;
+    border: black 1px solid;
+    background: lightpink;
+}
+
+.button {
+    background-color: rgb(242, 242, 242);
+    font-size: 1.3em;
+    height: 60px;
+    border-radius: 10px;
+    border: grey 1px solid;
+}

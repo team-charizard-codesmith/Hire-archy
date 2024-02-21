@@ -1,7 +1,10 @@
-const { query } = require("express");
+
 const db = require("../models/database");
 
+
+
 const jobController = {};
+
 
 jobController.addJob = (req, res, next) => {
 	const { title, salary, open_date, address, company_id, user_id } = req.body;
